@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Bink Wang">
+
+
+    <meta name="subtitle" content="受人以渔，还人以渔">
+
+
+    <meta name="description" content="一个根本不正经的技术博客">
+
+
+    <meta name="keywords" content="Python,PHP,Linux,CentOS,Ubuntu,Blockchain,Bitcoin,ETH,NAS">
+
+
+<title>萤石(EZVIZ) C6CN 网络摄像头 初探 | Bink&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Bink&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Bink&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="collapse_toc()">Collapse all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 6,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">萤石(EZVIZ) C6CN 网络摄像头 初探</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Bink Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 15, 2020&nbsp;&nbsp;12:31:53</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85/">智能家居</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><p>   心血来潮想入个家用监控摄像头，要求也非常简单：<br></p>
+<ul>
+<li><p>夜视效果清晰，不然到晚上就瞎了等于没有监控；</p>
+</li>
+<li><p>云台可操作大角度转动，属于基本功能；</p>
+</li>
+<li><p>视频流可截取，方便后续配合NAS进行更多拓展，这个是重点；</p>
+</li>
+<li><p>便宜…… 毕竟只是玩玩</p>
+<p><em>至于什么1080p之类的我反而无视了，理由很简单：基本都是吹，我用 <code>GoPro</code> 开 1080p 随便截几帧的画质可以摁着这些所谓“1080p”的各种摄像头的画质反复摩擦。</em></p>
+</li>
+</ul>
+<h3 id="二、选定萤石C6CN"><a href="#二、选定萤石C6CN" class="headerlink" title="二、选定萤石C6CN"></a>二、选定萤石C6CN</h3><p>   随便了解了一下之后草草选定了 <code>海康威视</code> 旗下民用品牌 <code>萤石</code>，具体型号参数介绍详见 <a href="https://www.ys7.com/item/9079.html?from=&position=tab" target="_blank" rel="noopener">萤石官网页面</a> <br></p>
+<p>   大体上该有的功能都有了，譬如：摄像头隐私遮盖、有线方式网络接入、SD卡本地存储、视频加密、设备离线提醒 之类；不该有的也有了，譬如：移动追踪、私有云存储、双向语音对讲、分享视频。</p>
+<h3 id="三、几个主要功能的简单试用"><a href="#三、几个主要功能的简单试用" class="headerlink" title="三、几个主要功能的简单试用"></a>三、几个主要功能的简单试用</h3><ol>
+<li><p><strong>WiFi 支持</strong></p>
+<p> 通过说明书我们知道这个摄像头 <code>WiFi仅支持 2.4G 信号</code>，总所周知城市里小区密集居住环境下各种 2.4G 信号泛滥信道干扰严重，也就是说如果你用WiFi方式玩这个摄像头，丢包掉线简直就是家常便饭。</p>
+<p> 因此我们下面涉及的各类和网络操作有关的功能，几乎都存在延迟和卡顿现象，而这个 2.4G WiFi 要背很大一口锅。因此，如果有钱的话最好能选择支持 <code>5G WiFi</code> 的网络摄像头，如果没条件的话可以插一根网线……</p>
+</li>
+<li><p><strong>移动追踪</strong></p>
+<p> 实际测试发现云台跟随速度不理想，存在卡顿现象；</p>
+<p> 这个算是情理之中，毕竟实现这个功能需要从最近几秒中抽取若干帧图像，然后找出移动物体，以及物理移动的方向和速度，再发送信号给云台朝着对应方向移动，按照经验来讲移动过程中应该是暂停了移动识别的，否则会出现误判；移动完成后再次进行移动物体识别和跟踪，如此循环。</p>
+<p> 那么一个如此廉价便宜的玩意儿，让CPU负担这么密集的图像运算真的是难为它了，跟踪过程的卡顿也就可以理解了。</p>
+</li>
+<li><p><strong>APP操作云台移动</strong></p>
+<p> 实际操作发现画面存在轻微卡顿；</p>
+<p> 这个仍然是情理之中的，毕竟通过APP发送操作指令通过公网转发给摄像头这本身就存在网络延迟，加之摄像头收到指令后通知云台转动，云台转动后新的画面再通过公网传输回手机APP画面，这多个环节叠加后延迟卡顿就非常直观了。</p>
+<p> 我相信如果全内网操作的话，这个延迟会非常小甚至感觉不出来，但是这不现实，毕竟我们用网络摄像头的目的就是为了出门在外随时随地观看。</p>
+</li>
+<li><p><strong>双向语音对讲</strong></p>
+<p> 实测测试发现有回音现象，而且声音清晰度较差，可能是我本身存在于摄像头附近的原因？下次我自己拿着APP去室外再试试；<br> 另外语音对讲存在延迟，这个基本上还是2.4G WiFi的锅。</p>
+</li>
+</ol>
+<h3 id="四、安全相关"><a href="#四、安全相关" class="headerlink" title="四、安全相关"></a>四、安全相关</h3><ol>
+<li><p><strong>云存储</strong></p>
+<p> 新用户默认赠送了7天的 <code>萤石云</code> 服务，摄像头拍摄的视频画面会直接上传存放在云端；</p>
+<p> 首先便捷性是值得肯定的，但是我对这种存储方式的安全性保持怀疑态度，毕竟我不打算把个人重要隐私的存放在一个我无法确认安全性到底任何的第三方服务器上。</p>
+<p> 说的难听点，当下绝大部分硬件厂商（指纹锁、行车记录仪、家用摄像头 等等）为了迎合消费市场而附带各种所谓的云存储、智能家居等，安全性真的堪忧，毕竟这些功能只是厂家的一个卖点而不是企业的核心。</p>
+</li>
+</ol>
+<ol start="2">
+<li><p><strong>远程查看</strong></p>
+<p> 众所周知，几乎所有的家用网络都没有公网IP（<em>虽然我家里有，但是毕竟是极少数</em>），所以想在户外通过手机APP观看处于家庭网络内网的视频，必然不是网络直连的，而是通过第三方服务器做了中转和桥接，大致工作方式类似：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">摄像头  --(WiFi或有线) --&gt; 家用路由器 --(ISP网络提供商)--&gt; 公网服务器</span><br><span class="line"></span><br><span class="line">手机APP --(4G或WiFi)  --&gt; 公网服务器</span><br></pre></td></tr></table></figure>
+
+<p> <em>（每一个 <code>摄像头</code> 都有唯一序列号（底部标签可见），在根据说明书首次使用时会注册到你手机APP上进行一个绑定操作，之后该摄像头只要联网就会把<code>序列号</code>和<code>视频画面</code>一起传输给<code>公网服务器</code>；而你在户外打开手机APP后，手机APP会请求<code>公网服务器</code>发送你账户下摄像头的<code>序列号</code>，拉取和你当前账户绑定的摄像头的画面下来。）</em></p>
+<p> 那么问题来了，这个公网服务器是萤石厂家自己提供的，理论上只要我可以伪造发送不属于我自己的<code>序列号</code>就能查看其他摄像头的画面了；事实上这样的事情并不是没有发生过，网络摄像头画面泄漏事件屡见不鲜，包括萤石自己的用户也有反馈过登录自己的帐号后看到的并不是自家摄像头画面这样的<code>串流</code>事件。</p>
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>RTSP 协议流</strong></p>
+<p> 作为本次选购家用摄像头的重中之重，我本来就是冲着 <strong>RTSP</strong> 才购买的这款摄像头，实测发现可以正常通过第三方软件截取视频流。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rtsp:&#x2F;&#x2F;admin:pass@192.168.2.109&#x2F;</span><br></pre></td></tr></table></figure>
+<p> <em>(admin 为默认，pass 为摄像头底部6位验证码，IP为摄像头内网分配IP地址)</em></p>
+<p> 如此一来，好玩的地方就多了：</p>
+<ul>
+<li><p>首先，可通过第三方视频流管理软件（我还在寻找类似群晖 Surveillance Station 套件的开源软件），或自己写Python脚本等方式（备选方案），在NAS上自动抓取视频画面保存到磁盘，这样我们就可以抛弃摄像头的云存储功能了，安全性得到提升的同时，我们的视频存储上限也将不再局限于内存卡的大小了。</p>
+</li>
+<li><p>随后，可以通过端口映射方式将摄像头的 <code>RTSP</code> 映射到我家里宽带的公网IP上，在户外情况下可以通过第三方APP直接访问家里的公网IP的方式来查看摄像头的视频流，从而避开萤石服务器的画面中转，安全性得到提升的同时，还能一定程度上得到更流畅的视频画面，毕竟萤石服务器的网络带宽是公用的。</p>
+</li>
+<li><p>最后，我们通过制定家用路由器防火墙策略，禁止萤石摄像头直接访问公网，仅允许通过路由器转发方式，从公网用端口转发的方式反向访问摄像头的RTSP端口。当然，这样一来萤石APP中的各种功能就都无法使用了，譬如：云台转动、摄像头遮盖等；因为这部分操作是萤石自己定义的协议，有机会的话我抓包破解一下吧。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="五、结束"><a href="#五、结束" class="headerlink" title="五、结束"></a>五、结束</h3><p>   总的来说对这款摄像头还是比较满意的，毕竟价位放在这里，最近事情比较多等忙完这阵就开始折腾 <code>RTSP</code> 协议的事情，有眉目后再发一篇博文单独讲一讲好了。</p>
+<p>   好了，打完收工！</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Bink Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://binkcn.com/2020/04/15/ezviz-webcam-c6cn/">https://binkcn.com/2020/04/15/ezviz-webcam-c6cn/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2020 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%90%A4%E7%9F%B3/"># 萤石</a>
+                    
+                        <a href="/tags/Ezviz/"># Ezviz</a>
+                    
+                        <a href="/tags/Webcam/"># Webcam</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/04/23/use-rm-remove-self/">我在Linux上用“rm”命令误删除了“rm”命令文件</a>
+            
+            
+            <a class="next" rel="next" href="/2020/04/10/new-baby/">我们家闺女出生啦！</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Bink Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

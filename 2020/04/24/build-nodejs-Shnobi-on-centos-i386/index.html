@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Bink Wang">
+
+
+    <meta name="subtitle" content="受人以渔，还人以渔">
+
+
+    <meta name="description" content="一个根本不正经的技术博客">
+
+
+    <meta name="keywords" content="Python,PHP,Linux,CentOS,Ubuntu,Blockchain,Bitcoin,ETH,NAS">
+
+
+<title>在32位CentOS 7上安装 nodejs 和 Shnobi | Bink&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Bink&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Bink&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="collapse_toc()">Collapse all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 6,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">在32位CentOS 7上安装 nodejs 和 Shnobi</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Bink Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 24, 2020&nbsp;&nbsp;17:00:15</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/NAS/">NAS</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>历时7个小时，总算在 <code>CentOS 7（32位）</code>上安装好了 <a href="https://shinobi.video/" target="_blank" rel="noopener">Shinobi</a>，整个编译过程遇到无数问题，然而最终还是被头铁的我逐一解决，我简直太难了，特此记录！</p>
+<p>先说 <code>Shinobi</code>，这是一个基于 <code>Nodejs</code> 开发的 <strong>完全开源的视频流管理软件</strong>，之前有过博文提到我在捣鼓一个 <a href="/2020/04/15/ezviz-webcam-c6cn/">萤石(EZVIZ) C6CN 网络摄像头</a>，在该文中提到我出于安全考虑打算禁用该摄像头接入公网，并且改用第三方手段来录制和存储录像视频，而 <code>Shinobi</code> 就是最终的选择，我已经提前在一台 <code>CentOS 7（64位）</code> 的VPS上进行过一次预装和体验，该软件的功能完全符合我的需求，因此这才准备开始在我的<code>NAS</code>上进行实际安装。</p>
+<p>由于我那台 <code>NAS</code> 的CPU不支持64位，最终安装了 <code>CentOS 7（32位）</code>，最终导致了本次我疯狂踩坑的悲惨经历……</p>
+<h3 id="万事开头难"><a href="#万事开头难" class="headerlink" title="万事开头难"></a>万事开头难</h3><blockquote>
+<p><strong>但是这个第一步也太难了啊！！！</strong></p>
+</blockquote>
+<p>首先，<code>Shinob</code> 的<a href="https://shinobi.video/docs/start" target="_blank" rel="noopener">安装要求</a> 如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Node.js (12+), FFmpeg (3.3+), and MariaDB (10.4+) are the main components that Shinobi needs.</span><br></pre></td></tr></table></figure>
+
+<p>然而 <code>Nodejs</code> 的<a href="https://nodejs.org/en/download/" target="_blank" rel="noopener">下载页面</a>并没有<code>32-bit</code>的版本，经过深思熟虑我决定直接下载源码进行本机编译：</p>
+<h4 id="源码方式编译最新版本nodejs"><a href="#源码方式编译最新版本nodejs" class="headerlink" title="源码方式编译最新版本nodejs"></a>源码方式编译最新版本nodejs</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https://nodejs.org/dist/v12.16.2/node-v12.16.2.tar.gz</span><br><span class="line">tar zxvf node-v12.16.2.tar.gz</span><br><span class="line"><span class="built_in">cd</span> node-v12.16.2</span><br><span class="line">./configure</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<p>在我这颗上古<code>奔腾4</code>单核CPU上足足跑了3个多小时后，以失败告终；看着 <code>make</code> 出来的一堆堆 <strong>ERROR</strong> 报错，欲哭无泪。</p>
+<h4 id="寻找支持32位的最新版本nodejs"><a href="#寻找支持32位的最新版本nodejs" class="headerlink" title="寻找支持32位的最新版本nodejs"></a>寻找支持32位的最新版本nodejs</h4><p>冷静下来后我想了想，<code>nodejs</code> 早期是有32位版本支持的，那么我直接找到支持32位的最后一个版本不就行了？</p>
+<p>说干就干，进入<a href="https://nodejs.org/download/release/" target="_blank" rel="noopener">Nodejs Release Download</a>，然后按照版本号倒序挨个点进去：</p>
+<ul>
+<li>latest-v12.x/</li>
+<li>latest-v11.x/</li>
+<li>latest-v10.x/</li>
+<li>latest-v9.x/</li>
+</ul>
+<p>找到了 <a href="https://nodejs.org/download/release/latest-v9.x/node-v9.11.2-linux-x86.tar.gz" target="_blank" rel="noopener">node-v9.11.2-linux-x86.tar.gz</a>，然后根据 <a href="https://github.com/nodejs/help/wiki/Installation#how-to-install-nodejs-via-binary-archive-on-linux" target="_blank" rel="noopener">How to install Node.js via binary archive on Linux?</a> 对二进制包进行解压，并且设置环境变量，测试成功：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@private Shinobi]# node -v</span><br><span class="line">v9.11.2</span><br><span class="line"></span><br><span class="line">[root@private Shinobi]# npm version</span><br><span class="line">&#123; npm: '6.14.4',</span><br><span class="line">  ares: '1.13.0',</span><br><span class="line">  cldr: '33.0',</span><br><span class="line">  http_parser: '2.8.0',</span><br><span class="line">  icu: '61.1',</span><br><span class="line">  modules: '59',</span><br><span class="line">  napi: '3',</span><br><span class="line">  nghttp2: '1.32.0',</span><br><span class="line">  node: '9.11.2',</span><br><span class="line">  openssl: '1.0.2o',</span><br><span class="line">  tz: '2018c',</span><br><span class="line">  unicode: '10.0',</span><br><span class="line">  uv: '1.19.2',</span><br><span class="line">  v8: '6.2.414.46-node.23',</span><br><span class="line">  zlib: '1.2.11' &#125;</span><br><span class="line"></span><br><span class="line">[root@private Shinobi]# npx -v</span><br><span class="line">6.14.4</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二只拦路虎：FFmpeg"><a href="#第二只拦路虎：FFmpeg" class="headerlink" title="第二只拦路虎：FFmpeg"></a>第二只拦路虎：FFmpeg</h4><p>在 <code>CentOS 7</code> 上安装 <code>FFmpeg</code> 最简单的方法是通过 <code>Nux Dextop</code> 仓库的方式安装：</p>
+<p><em>（注：<code>Shinobi</code> 官方自动化安装脚本是也是采用该仓库进行安装，下面的代码摘自 <code>Shinobi</code>源码的 <code>INSTALL/centos.sh</code>）</em></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#Install EPEL Repo</span></span><br><span class="line">sudo yum install epel-release -y</span><br><span class="line"><span class="comment">#Enable Nux Dextop repo for FFMPEG</span></span><br><span class="line">sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro</span><br><span class="line">sudo rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm</span><br><span class="line">sudo yum install ffmpeg ffmpeg-devel -y</span><br></pre></td></tr></table></figure>
+
+<p>然而实际情况是，<a href="http://li.nux.ro/download/nux/dextop/el7/" target="_blank" rel="noopener">http://li.nux.ro/download/nux/dextop/el7/</a> 下只有 <code>x86_64</code>，嗯……</p>
+<p>头铁不信邪的我，打算试试 <code>CentOS 6（32位）</code> 版本的安装包是否能够安装，结果当然是失败的，过程就不贴了，太愚蠢了。</p>
+<hr>
+<p>时来运转，我在<a href="https://www.ffmpeg.org/download.html" target="_blank" rel="noopener">FFmpeg 官网下载页面</a> 发现了有<code>32-bit</code> 的 <a href="https://johnvansickle.com/ffmpeg/" target="_blank" rel="noopener">Linux Static Build</a>，抱着试试的心态开搞：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz</span><br><span class="line">tar xvf ffmpeg-release-i686-static.tar.xz </span><br><span class="line">sudo mv ffmpeg-4.2.2-i686-static/ffmpeg ffmpeg-4.2.2-i686-static/ffprobe /usr/bin/</span><br></pre></td></tr></table></figure>
+
+<p>搞定，测试可用：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@private Shinobi]# ffmpeg</span><br><span class="line">ffmpeg version 4.2.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2019 the FFmpeg developers</span><br><span class="line">  built with gcc 8 (Debian 8.3.0-6)</span><br><span class="line">  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gmp --enable-libgme --enable-gray --enable-libfribidi --enable-libass --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libsrt --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg</span><br><span class="line">  libavutil      56. 31.100 / 56. 31.100</span><br><span class="line">  libavcodec     58. 54.100 / 58. 54.100</span><br><span class="line">  libavformat    58. 29.100 / 58. 29.100</span><br><span class="line">  libavdevice    58.  8.100 / 58.  8.100</span><br><span class="line">  libavfilter     7. 57.100 /  7. 57.100</span><br><span class="line">  libswscale      5.  5.100 /  5.  5.100</span><br><span class="line">  libswresample   3.  5.100 /  3.  5.100</span><br><span class="line">  libpostproc    55.  5.100 / 55.  5.100</span><br><span class="line">Hyper fast Audio and Video encoder</span><br><span class="line">usage: ffmpeg [options] [[infile options] -i infile]... &#123;[outfile options] outfile&#125;...</span><br><span class="line"></span><br><span class="line">Use -h to get full help or, even better, run 'man ffmpeg'</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="正式安装-Shinobi"><a href="#正式安装-Shinobi" class="headerlink" title="正式安装 Shinobi"></a>正式安装 Shinobi</h3><p>从Git仓库拉源码，然后搞配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">yum install git -y</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /home</span><br><span class="line">git <span class="built_in">clone</span> https://gitlab.com/Shinobi-Systems/Shinobi.git Shinobi</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> Shinobi</span><br><span class="line">cp conf.sample.json conf.json</span><br><span class="line">cp super.sample.json super.json</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>vi conf.json</code>，修改端口<code>port</code>，视频存储路径<code>addStorage</code>，事务密匙<code>cron.key</code> 这三项。</li>
+<li><code>vi super.json</code>，修改超级管理员帐号密码 <code>mail</code> 和 <code>pass</code>。</li>
+</ul>
+<p>执行 <code>CentOS</code> 安装脚本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x INSTALL/centos.sh &amp;&amp; INSTALL/centos.sh</span><br></pre></td></tr></table></figure>
+
+<p>根据安装指引，分别完成以下安装步骤：</p>
+<ul>
+<li><code>Install Node.js</code> 检查及安装，因为我们前面已经安装了 9.x 版本，这里会直接显示版本号。</li>
+<li><code>Install FFMPEG</code> 检查及安装，这里我选择了 <code>npm</code> 方式安装。（这里有个坑，后面会提到）</li>
+<li><code>Install MariaDB</code> 检查及安装，常规的数据库安装流程，根据提示安装即可。</li>
+<li><code>Shinobi - Database Installation</code> 初始化 <code>Shinobi</code> 数据库。（这里有一个报错，但不是每个人都会遇到，跟你的数据库版本有关，需要手动处理，后面会提到）</li>
+<li><code>Install NPM Libraries</code> 自动完成，无需干涉。</li>
+<li><code>Install PM2</code> 自动完成，无需干涉。</li>
+</ul>
+<blockquote>
+<p>接下来询问是否开机启动，选择<code>Y</code>后会自动启动<code>Shinobi</code>并且设置开机启动。</p>
+</blockquote>
+<p>安装过程到此结束，我们看看运行状态：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@private Shinobi]# sudo pm2 list</span><br><span class="line">┌─────┬───────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐</span><br><span class="line">│ id  │ name      │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │</span><br><span class="line">├─────┼───────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤</span><br><span class="line">│ 0   │ camera    │ default     │ 2.0.0   │ fork    │ 2838     │ 2h     │ 2    │ online    │ 0.7%     │ 77.6mb   │ root     │ disabled │</span><br><span class="line">│ 1   │ cron      │ default     │ 2.0.0   │ fork    │ 2844     │ 2h     │ 2    │ online    │ 0.4%     │ 34.4mb   │ root     │ disabled │</span><br><span class="line">└─────┴───────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘</span><br></pre></td></tr></table></figure>
+
+<h4 id="无法访问？"><a href="#无法访问？" class="headerlink" title="无法访问？"></a>无法访问？</h4><p>访问 <code>http://127.0.0.1:8080</code> 失败，然后看下端口监听：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@private Shinobi]# netstat -anop | grep node | grep LISTEN</span><br></pre></td></tr></table></figure>
+
+<p>居然没有任何监听，发生了什么？只能查看系统日志：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@private Shinobi]# cd /home/Shinobi</span><br><span class="line">./INSTALL/shinobi logs</span><br><span class="line"></span><br><span class="line">/root/.pm2/logs/camera-out.log last 100 lines:</span><br><span class="line">0|camera   | Shinobi is Exiting...</span><br><span class="line">0|camera   | ffbinaries : Downloading FFmpeg. Please Wait...</span><br><span class="line">0|camera   | 2020-04-24T14:18:40+08:00 Current Version : c2b393b86de5511d6d2d60dfe5548fe0f2889793</span><br><span class="line">0|camera   |</span><br></pre></td></tr></table></figure>
+
+<p>可是我明明装好了<code>FFmpeg</code>了呀？只能看<code>Shinobi</code>源码了，先看<code>camera.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">33</span> loadLib(<span class="string">'ffmpeg'</span>)(s,config,lang,<span class="function"><span class="keyword">function</span>(<span class="params">ffmpeg</span>)</span>&#123;</span><br></pre></td></tr></table></figure>
+
+<p>继续看<code>libs/ffmpeg.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">48</span>     <span class="comment">//check node module : ffbinaries</span></span><br><span class="line"><span class="number">49</span>     ffmpeg.checkForFfbinary = <span class="function"><span class="keyword">function</span>(<span class="params">failback</span>)</span>&#123;</span><br><span class="line"><span class="number">50</span>         <span class="keyword">try</span>&#123;</span><br><span class="line"><span class="number">51</span>             ffbinaries = <span class="built_in">require</span>(<span class="string">'ffbinaries'</span>)</span><br><span class="line"><span class="number">52</span>             <span class="keyword">var</span> ffbinaryDir = s.mainDirectory + <span class="string">'/ffmpeg/'</span></span><br><span class="line"><span class="number">53</span>             <span class="keyword">var</span> downloadFFmpeg = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"><span class="number">54</span>                 downloadingFfmpeg = <span class="literal">true</span></span><br><span class="line"><span class="number">55</span>                 <span class="built_in">console</span>.log(<span class="string">'ffbinaries : Downloading FFmpeg. Please Wait...'</span>);</span><br><span class="line"><span class="number">56</span>                 ffbinaries.downloadBinaries([<span class="string">'ffmpeg'</span>, <span class="string">'ffprobe'</span>], &#123;</span><br><span class="line"><span class="number">57</span>                     destination: ffbinaryDir,</span><br><span class="line"><span class="number">58</span>                     version : <span class="string">'3.4'</span></span><br><span class="line"><span class="number">59</span>                 &#125;,<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="number">60</span>                     config.ffmpegDir = ffbinaryDir + <span class="string">'ffmpeg'</span></span><br><span class="line"><span class="number">61</span>                     <span class="built_in">console</span>.log(<span class="string">'ffbinaries : FFmpeg Downloaded.'</span>);</span><br><span class="line"><span class="number">62</span>                     ffmpeg.completeCheck()</span><br><span class="line"><span class="number">63</span>                 &#125;)</span><br><span class="line"><span class="number">64</span>             &#125;</span><br><span class="line"><span class="number">65</span>             <span class="keyword">if</span> (!fs.existsSync(ffbinaryDir + <span class="string">'ffmpeg'</span>)) &#123;</span><br><span class="line"><span class="number">66</span>                 downloadFFmpeg()</span><br><span class="line"><span class="number">67</span>             &#125;<span class="keyword">else</span>&#123;</span><br><span class="line"><span class="number">68</span>                 config.ffmpegDir = ffbinaryDir + <span class="string">'ffmpeg'</span></span><br><span class="line"><span class="number">69</span>             &#125;</span><br><span class="line"><span class="number">70</span>         &#125;<span class="keyword">catch</span>(err)&#123;</span><br><span class="line"><span class="number">71</span>             <span class="built_in">console</span>.log(<span class="string">'No "ffbinaries". Continuing.'</span>)</span><br><span class="line"><span class="number">72</span>             <span class="built_in">console</span>.log(<span class="string">'Run "npm install ffbinaries" to get this static FFmpeg downloader.'</span>)</span><br><span class="line"><span class="number">73</span>             failback()</span><br><span class="line"><span class="number">74</span>         &#125;</span><br><span class="line"><span class="number">75</span>     &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这下明白了，在 <code>/home/Shinobi/ffmpeg/</code> 下没有找到<code>ffmpeg</code>这个二进制文件，所以<code>ffbinaries</code>开始下载，然而下载速度又奇慢无比，所以导致后续代码无法执行，因此整个程序没有起来，知道原因就简单了，我们之前不是下载过编译好的静态 <code>ffmpeg</code> 二进制文件么？直接拷过来：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -f /usr/bin/ffmpeg /home/Shinobi/ffmpeg/</span><br></pre></td></tr></table></figure>
+
+<h4 id="数据库初始化时的问题"><a href="#数据库初始化时的问题" class="headerlink" title="数据库初始化时的问题"></a>数据库初始化时的问题</h4><p>前面提到在执行安装脚本初始化数据库的时候有一个报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR 1293 (HY000): Incorrect table definition; there can be only one TIMESTAMP column with CURRENT_TIMESTAMP in DEFAULT or ON UPDATE clause</span><br></pre></td></tr></table></figure>
+
+<p>错误是执行<code>sql/framework.sql</code>这个数据库初始化sql文件时产生的，具体行数是41行。</p>
+<p>解决方法参见：<a href="https://my.oschina.net/BearCatYN/blog/911672" target="_blank" rel="noopener">MySQL错误TIMESTAMP column with CURRENT_TIMESTAMP的解决方法</a></p>
+<p>所以解决起来就很简单了，把<code>end</code>字段移到<code>time</code>字段之前：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- Dumping structure for table ccio.Timelapses</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> <span class="string">`Timelapses`</span> (</span><br><span class="line">  <span class="string">`ke`</span> <span class="built_in">varchar</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`mid`</span> <span class="built_in">varchar</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`details`</span> longtext,</span><br><span class="line">  <span class="string">`date`</span> <span class="built_in">date</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`end`</span> <span class="built_in">timestamp</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> <span class="keyword">UPDATE</span> <span class="keyword">CURRENT_TIMESTAMP</span>,</span><br><span class="line">  <span class="string">`time`</span> <span class="built_in">timestamp</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`size`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span></span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8mb4;</span><br></pre></td></tr></table></figure>
+<p>然后手动单独执行这个表创建代码即可。</p>
+<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><blockquote>
+<p>最后，<code>Shinobi</code> 终于安装完成并且正常工作了，这波成就感拉满了；<br>后面有机会的话我来写一写<code>Shinobi</code>的使用体验，网上貌似很少有人分享。</p>
+</blockquote>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Bink Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://binkcn.com/2020/04/24/build-nodejs-Shnobi-on-centos-i386/">https://binkcn.com/2020/04/24/build-nodejs-Shnobi-on-centos-i386/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2020 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CentOS/"># CentOS</a>
+                    
+                        <a href="/tags/NAS/"># NAS</a>
+                    
+                        <a href="/tags/Shnobi/"># Shnobi</a>
+                    
+                        <a href="/tags/Nodejs/"># Nodejs</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/06/03/algorithms-4-learning-notes-preface/">《算法4》学习笔记（序）</a>
+            
+            
+            <a class="next" rel="next" href="/2020/04/23/use-rm-remove-self/">我在Linux上用“rm”命令误删除了“rm”命令文件</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Bink Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Bink Wang">
+
+
+    <meta name="subtitle" content="受人以渔，还人以渔">
+
+
+    <meta name="description" content="一个根本不正经的技术博客">
+
+
+    <meta name="keywords" content="Python,PHP,Linux,CentOS,Ubuntu,Blockchain,Bitcoin,ETH,NAS">
+
+
+<title>戴尔老机器 GX280 安装 CentOS 7 minimal 用做 NAS | Bink&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Bink&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Bink&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="collapse_toc()">Collapse all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 6,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">戴尔老机器 GX280 安装 CentOS 7 minimal 用做 NAS</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Bink Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 6, 2020&nbsp;&nbsp;19:40:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/NAS/">NAS</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>闲来无事想折腾一台NAS玩玩，经过一些了解发现 NAS 目前有3个流派：白群晖、黑群晖、自组DIY；作为一个运维经验丰富的全栈码农(大笑)我当然是选择DIY了，但是 NAS 对我来说又不是多么硬核的需求，因此预算越低越好。</p>
+<p>本来在看星际矿渣和一些J1900之类的主板，好巧不巧发现同事扔了一台上古DELL主机在公司角落，直接开口要了过来。</p>
+<p>经过近一周的硬件和软件调整，现在已经稳定工作了，特此发帖庆贺。</p>
+<h3 id="尝试点亮"><a href="#尝试点亮" class="headerlink" title="尝试点亮"></a>尝试点亮</h3><p>裸主机只有CPU、主板、内存、电源、无硬盘，赶紧找了一些显示器、电源线、VGA线之类的尝试开机看看BIOS，结果居然点不亮？</p>
+<p>只能通过主板型号反查到了机器型号，上DELL官网找到该机型页面下载了PDF用户手册，根据手册诊断配合机箱背面的诊断灯(ABCD 4个灯不同组合颜色代表不同故障，很有用的)发现是因为没有检测到硬盘(这上古神器太牛逼了，没有硬盘连BIOS都不让你进)；</p>
+<p>赶紧翻出一个垃圾硬盘插上开机，点亮了！</p>
+<h3 id="上古机器配置"><a href="#上古机器配置" class="headerlink" title="上古机器配置"></a>上古机器配置</h3><p>卧槽什么鬼？奔腾4 2.9G单核？1MB 2级缓存？DDR2 533赫兹内存条？这可太硬核了！而且风扇杂音巨大……</p>
+<p>虽然话是这么讲，但是我还觉得这个机箱设计挺有趣的，首先体积相对较小，机身纤薄，差不多就是一台M-ATX机箱大小，然后上下按压锁扣翻盖开启机箱，PCI-E插槽卡扣快拆，电源卡扣快拆，硬盘光驱卡扣快拆；</p>
+<p>硬件配置有单口千兆网卡(这个很关键)、一个SATA I(是的，就一个，还是第一代SATA……)、1个PATA口(光驱用)、8个(前2后6)USB2.0插口、一个PCI插槽、一个PCI-E x16 1.0插槽，CPU 散热采用双铜管散热座+涡流风扇；</p>
+<p>行吧，基本符合我需求，除了一个SATA口有点蛋疼，不过我不做RAID也没有什么特别重要的数据要放，一个盘也够用了，随后又继续白嫖了同事一个1TB机械硬盘…… 中国好同事啊！</p>
+<h3 id="简单整理准备复活"><a href="#简单整理准备复活" class="headerlink" title="简单整理准备复活"></a>简单整理准备复活</h3><p>机器抗回家后，迫不及待的打理了一番，先是掏出戴森吸尘器换扁嘴口，风力开到最大一顿猛吸，吸出拳头大一坨棉絮；</p>
+<p>然后用之前给 Alienware 买的 ARCTIC 导热硅脂给上古P4 CPU重新涂抹了散热，并且拆开了涡流风扇进行一些清灰操作，顺便撕开风扇贴纸找到风扇轴承喷了一点点WD40，手动转动几圈后用镊子+纸巾擦干净，然后再滴了几滴我模型车专用的轴承润滑油。</p>
+<p>开机提示BIOS电量过低，遂又更换了新的BIOS电池。</p>
+<p>为了方便以后家里调试和修改BIOS设定，某宝20包邮买了个HD4350带HDMI接口，这样就能接电视的HDMI接口了。</p>
+<p>最后简单整理了一下凌乱的走线，打完收工。</p>
+<h3 id="操作系统选择"><a href="#操作系统选择" class="headerlink" title="操作系统选择"></a>操作系统选择</h3><p>看了看群晖系统的各项功能，大部分用不上，小部分用的上的功能都能找到不错的开源软件自己搭建，所以果断采用了我非常熟悉的 CentOS，从官网下载了 <code>CentOS 7 minimal i386</code> 安装，安装过程一切正常略过不表。</p>
+<p><em>注：事实证明选择 CentOS 7 32位是个败笔，因为 CentOS 上很多主流软件包都在 EPEL 仓库中，而 CentOS 7 的 EPEL 仓库中绝大部分软件都不再编译i386/i686的发布版…… 回头还得抽空还回 CentOS 6 去。</em></p>
+<h3 id="开源软件安装"><a href="#开源软件安装" class="headerlink" title="开源软件安装"></a>开源软件安装</h3><ol>
+<li><p><a href="https://www.seafile.com/home/" target="_blank" rel="noopener">Seafile</a> 私有云搭建，官网最新的7.x版本已经不支持i386，只有64位版本，多方辗转最后终于让我找到6.x i386版本，安装运行一切正常。 主要是用户公司、家、移动设备之间的文件(主要是文档、文件、图片)同步，以及家庭照片存储和分享。</p>
+<p> <em>注：Seafile目前已经停用，因为Seafile的客户端认证和文件传输均采用HTTP/HTTPS方式，而目前上海电信针对家庭用户提供Web页面的筛查和封杀非常严格。</em></p>
+</li>
+<li><p><a href="https://www.samba.org/cifs/docs/what-is-smb.html" target="_blank" rel="noopener">samba</a> 文件共享，这个没什么好说的，简单粗暴。因为Seafile服务器存储会切碎文件，而一些视频之类的我还是喜欢原样存储在磁盘上，所以就用SMB挂载了，方便好用。</p>
+</li>
+<li><p><a href="http://www.webmin.com/" target="_blank" rel="noopener">webmin</a>，一个Web端的类Unix管理，简单说就是通过网页管理操作你的Linux机器，具有root权限。</p>
+<p> <em>注：已废弃，实在太臃肿了，而且功能大部分不那么实用，很多操作还不如我直接 <code>ssh</code> 操作修改来得方便</em></p>
+</li>
+<li><p><a href="https://cockpit-project.org/" target="_blank" rel="noopener">cockpit</a>，同上，但是非常轻量化，当然功能也非常少，只有一个CPU、MEM、IO、NET的图表算有点用处。</p>
+<p> <em>注：也废弃了，只能看个图表我不如多开几个ssh session用<code>top</code>等命令来的方便</em></p>
+</li>
+<li><p><a href="https://github.com/fatedier/frp" target="_blank" rel="noopener">frp</a>，这是一个可用于内网穿透的高性能的反向代理应用，不知道上海电信抽什么风我原来是有公网IP的，前些时候给我折腾没了(可能跟前些天IPv4宣布耗尽有关？)，所以暂时用frp过渡一下，后面还是要去跟电信扯皮要回一个公网IP的。</p>
+<p> <em>注：目前已经获得公网IP了，电信直接10000号报修，师傅一听我说NAS就懂了，等他操作好我重启光猫就拿到公网IP了，开心</em></p>
+</li>
+</ol>
+<h3 id="网络布局："><a href="#网络布局：" class="headerlink" title="网络布局："></a>网络布局：</h3><p>我的网络布局非常简单且常见，电信千兆光猫入户，LAN口连接 <code>K2P</code> 路由器，NAS和家里所有设备全部直接连接路由器；网线部分全部采用六类网线可达千兆网速。</p>
+<p>光猫已经通过 ttl 方式拿到超级密码，并且测试可以改为桥接模式通过路由器拨号，但是考虑到这样一来就白瞎了光猫的硬件所以目前还是通过光猫拨号连网。</p>
+<p>K2P 路由器是B1版本，直接刷了官改。</p>
+<p>光猫上只开放了 9、22、3389 的端口转发，转发到路由器IP上，路由器再二次端口转发到具体的设备IP上。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>有一些蛋疼的地方，首先是P4 CPU只能安装32位操作系统，很多软件都只能找到64位的，实在想要的话只能找老版本或者自己编译32位的，如果找不到源码，仓库里有没有i386 i686的包就只能凉凉，比如Docker；</p>
+<p>然后就是CPU和主板都没有温度传感器(起码我Linux下是真的找不到)，不知道Windows下装个AIDA64能不能找到传感器，我觉得够呛。所以我现在想知道CPU温度就只能手持红外测温枪对着南北桥和CPU散热座打一打…… 哈哈哈哈哈</p>
+<p>最后就是功耗问题了，总所周知P4是个高频低能的憨憨，功率测试仪显示待机状态下功耗稳定在68W左右。不过我有远程唤醒的话，其实不用24小时开机的。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Bink Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://binkcn.com/2020/01/06/dell-optiplex-gx280-as-nas-server/">https://binkcn.com/2020/01/06/dell-optiplex-gx280-as-nas-server/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2020 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CentOS/"># CentOS</a>
+                    
+                        <a href="/tags/NAS/"># NAS</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/01/07/ubuntu-mount-smb-use-ssh-tunnel/">Ubuntu 18.04 LTS 下通过 SSH 隧道挂载位于家中的 SMB 共享。</a>
+            
+            
+            <a class="next" rel="next" href="/2020/01/05/first-blog/">终于想写写博客了</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Bink Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

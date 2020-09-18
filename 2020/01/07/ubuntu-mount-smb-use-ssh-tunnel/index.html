@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Bink Wang">
+
+
+    <meta name="subtitle" content="受人以渔，还人以渔">
+
+
+    <meta name="description" content="一个根本不正经的技术博客">
+
+
+    <meta name="keywords" content="Python,PHP,Linux,CentOS,Ubuntu,Blockchain,Bitcoin,ETH,NAS">
+
+
+<title>Ubuntu 18.04 LTS 下通过 SSH 隧道挂载位于家中的 SMB 共享。 | Bink&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Bink&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Bink&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="collapse_toc()">Collapse all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 6,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Ubuntu 18.04 LTS 下通过 SSH 隧道挂载位于家中的 SMB 共享。</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Bink Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 7, 2020&nbsp;&nbsp;11:02:30</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/NAS/">NAS</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>家中有一台 CentOS 7 服务器作为 NAS 运行，并运行了 <code>Samba</code> 服务，且具有电信宽带公网IP，但是445端口和80、443一并被封，虽然 Samba 协议下可以修改445端口，但是这样一来家里的 Windows 访问共享就不方便了，毕竟 Windows 访问 SMB 共享时不支持自定义端口。但我又需要在公司内访问家中的 SMB 共享存放文件。</p>
+<hr>
+<h3 id="SSH隧道"><a href="#SSH隧道" class="headerlink" title="SSH隧道"></a>SSH隧道</h3><p>关于 SSH 隧道原理网上文章很多就不重复了，具体隧道创建及SMB挂载方式如下：</p>
+<ol>
+<li><p>首先创建SSH隧道：（在本地监听445端口，并且打通NAS服务器上的445端口连接）</p>
+<p> <code>ssh -f -N -L 445:127.0.0.1:445 root@mynas.yourdomain.com -p 2222</code></p>
+<p> <em>注：<code>mynas.yourdomain.com</code>修改为你自己NAS的域名或公网IP，<code>-p 2222</code>修改为你自己NAS的SSH端口</em></p>
+</li>
+<li><p>查看本地SSH隧道监听是否建立：（主要查看<code>Local Address:Port</code>这一列是否有本地445端口监听）</p>
+<p> <code>ss -tnl</code></p>
+</li>
+<li><p>创建本机挂载点：</p>
+<p> <code>sudo mkdir -p /home/bink/NAS</code></p>
+</li>
+<li><p>通过 <code>id</code> 命令查看本机用户及用户组ID，用于挂载后的权限设置。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bink@bink-desktop:~$ id</span><br><span class="line">uid&#x3D;1000(bink) gid&#x3D;1000(bink) 组&#x3D;1000(bink),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),116(lpadmin),126(sambashare)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过 <code>mount</code> 命令创建挂载：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -t cifs &#x2F;&#x2F;127.0.0.1&#x2F;Lan_Samba &#x2F;home&#x2F;bink&#x2F;NAS&#x2F; -o username&#x3D;samba,password&#x3D;sambapwd,uid&#x3D;1000,gid&#x3D;1000</span><br></pre></td></tr></table></figure>
+
+<p> <code>Lan_Samba</code> 是我 NAS 共享中的一个共享的名称；<br><br> <code>username=samba,password=sambapwd</code> 指定共享挂载的用户帐号；<br><br> <code>uid=1000,gid=1000</code> 这里是指定挂载后的目录权限，<code>1000</code>是第四步中得到的指定用户和用户组GUID，如果不指定，则以当前用户权限进行挂载，很可能出现挂载后的目录属于root而无法操作的情况。<br></p>
+</li>
+</ol>
+<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><p>现已可以通过本地主目录直接访问家中 NAS 的 SMB 共享文件夹了，在家里 <code>200M下行/30M上行</code> 宽带的网速下，访问共享感觉不到延迟，文件拷贝速度也还能接受。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Bink Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://binkcn.com/2020/01/07/ubuntu-mount-smb-use-ssh-tunnel/">https://binkcn.com/2020/01/07/ubuntu-mount-smb-use-ssh-tunnel/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2020 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Ubuntu/"># Ubuntu</a>
+                    
+                        <a href="/tags/SMB/"># SMB</a>
+                    
+                        <a href="/tags/SSH/"># SSH</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/01/08/ubuntu-umount-smb-fail/">Ubuntu 18.04 LTS 挂载 SMB 网络断开后导致df命令卡死的处理</a>
+            
+            
+            <a class="next" rel="next" href="/2020/01/06/dell-optiplex-gx280-as-nas-server/">戴尔老机器 GX280 安装 CentOS 7 minimal 用做 NAS</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Bink Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
